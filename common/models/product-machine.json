@@ -1,0 +1,29 @@
+{
+  "name": "ProductMachine",
+  "plural": "product-machine",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "productId": {
+      "type": "number",
+      "required": true
+    },
+    "machineId": {
+      "type": "number"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "sales": {
+      "type": "number",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

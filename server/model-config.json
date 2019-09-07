@@ -14,15 +14,16 @@
       "./mixins"
     ]
   },
-  "Student": {
-    "dataSource": "mysql_01",
-    "public": true,
-    "options": {
-      "remoting": {
-        "sharedMethods": {
-          "*": true
-        }
-      }
-    }
+  "Product": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "Machine": {
+    "dataSource": "mongodb",
+    "public": false
+  },
+  "ProductMachine": {
+    "dataSource": "mongodb",
+    "public": true
   }
 }

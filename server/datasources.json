@@ -1,12 +1,7 @@
 {
-  "mysql_01": {
-    "name": "mysql_01",
-    "host": "localhost",
-    "port": 3306,
-    "database": "loopback_test_001",
-    "user": "local_user_001",
-    "password": "password",
-    "connector": "mysql",
-    "collation": "utf8_unicode_ci"
+  "mongodb": {
+    "url": "mongodb://bitzero:hackathon2019@ds317808.mlab.com:17808/bitzero",
+    "name": "mongodb",
+    "connector": "loopback-connector-mongodb"
   }
 }

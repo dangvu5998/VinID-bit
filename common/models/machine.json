@@ -1,0 +1,21 @@
+{
+  "name": "Machine",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "machineId": {
+      "type": "number",
+      "required": true
+    },
+    "machineInfo": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
