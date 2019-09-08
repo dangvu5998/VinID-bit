@@ -34,7 +34,7 @@ module.exports = function(Customer) {
         // list = JSON.parse(list)
         let standardList = {}
         let ProductMachine = app.models.ProductMachine
-        for (const [key, value] of Object.entries(list)) {
+        for (let [key, value] of Object.entries(list)) {
             let machineIdInList = parseInt(key.split('_')[0], 10)
             if (machineIdInList != machineId) {
                 continue
