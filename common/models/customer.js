@@ -52,11 +52,11 @@ module.exports = function(Customer) {
 
     Customer.remoteMethod(
         'openApp', {
-            http: {path: '/open-app', verb: 'get'},
+            http: {path: '/open-app', verb: 'post'},
             accepts:
             [
-                {arg: 'machine_id', type: 'number', required: true},
-                {arg: 'public_key', type: 'string', required: true}
+                {arg: 'machine_id', type: 'number', required: true, http: {source: 'query'}},
+                {arg: 'public_key', type: 'string', required: true, http: {source: 'query'}}
             ],
             returns: {arg: 'data', type: 'object'}
         }
