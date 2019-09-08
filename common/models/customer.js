@@ -21,7 +21,10 @@ module.exports = function(Customer) {
         return await form.productForm(machineId, publicKey)
     }
 
-    Customer.buy = async function(list, machineId, publicKey) {
+    Customer.buy = async function(req, information) {
+        let list = req.body
+        let machineId = parseInt(information.split(':::')[0])
+        let publicKey = information.split(':::')[1]
         // console.log(list, machineId, publicKey)
         // let list = metadata.elements
         // for (let i in list) {
@@ -38,6 +41,7 @@ module.exports = function(Customer) {
             }
             let productIdInList = parseInt(key.split('_')[1], 10)
             let remain = ProductMachine.findOne({where: {productId: productIdInList, machineId: machineIdInList}}).amount
+            value = parseInt(value, 10)
             if (value < 0) {
                 value = 0
             }
@@ -70,7 +74,7 @@ module.exports = function(Customer) {
             http: {path: '/buy', verb: 'post'},
             accepts:
             [
-                {arg: 'list', type: 'object', required: true},
+                {arg: 'req', type: 'object', required: true, http: {source: 'req'}},
                 {arg: 'information', type: 'string', required: true, http: {source: 'query'}}
             ],
             returns: {arg: 'data', type: 'object'}
