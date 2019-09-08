@@ -62,12 +62,13 @@ module.exports = {
         for (let i in productMachine) {
             let product = await Product.findOne({where: {productId: productMachine[i].productId}})
             let productName = product.productName
+            let productPrice = product.price
             form.metadata.elements.push({
                 type: 'input',
                 input_type: 'number',
                 name: `${productMachine[i].productId}_${productMachine[i].machineId}`,
                 placeholder: `Còn ${productMachine[i].amount} sản phẩm`,
-                label: productName
+                label: `${productName} - ${productPrice}`
             })
         }
         form.metadata.submit_button.url = urlRoot + "/buy" + `?information=${machineId}:::${publicKey}`
