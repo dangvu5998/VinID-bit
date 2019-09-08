@@ -25,6 +25,7 @@ module.exports = function(Customer) {
         let list = req.body
         let machineId = parseInt(information.split(':::')[0])
         let publicKey = information.split(':::')[1]
+        publicKey = "-----BEGIN PUBLIC KEY----- MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJEQ4DedOewYLSpL4voJYoJa2JjZGTfd 3XTuDASnWIamvlhG0htrEh33aq2U57aYj646J3KUuLjVp7jTxe5Em3ECAwEAAQ== -----END PUBLIC KEY-----"
         // console.log(list, machineId, publicKey)
         // let list = metadata.elements
         // for (let i in list) {
