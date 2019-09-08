@@ -40,7 +40,7 @@ module.exports = function(Customer) {
             W6TNgbPyF3KUJwIga6pxvpMoioxfCEJx53sTqvNM27xBnMXxpug8KB/J2PkCIHU9
             85Uqsug6w1xL6zFghnYt+IpKPNAobL63LMlML5AB
             -----END RSA PRIVATE KEY-----`
-        console.log(await code.decryptRSA(listStringEncrypted, pk))
+        console.log(await code.decryptRSA(listStringEncrypted, pri_k))
         console.log('-----------------')
         let qrBase64 = await code.encodeQR(listStringEncrypted)
         return await form.QR(qrBase64, machineId, publicKey)
