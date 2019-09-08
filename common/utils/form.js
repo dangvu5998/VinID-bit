@@ -70,7 +70,7 @@ module.exports = {
                 label: productName
             })
         }
-        form.metadata.submit_button.url = urlRoot + "/buy" + `?machine_id=${machineId}&public_key=${publicKey}`
+        form.metadata.submit_button.url = urlRoot + "/buy" + `?information=${machineId}:::${publicKey}`
         return form
     },
 

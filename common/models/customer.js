@@ -6,7 +6,11 @@ let form = require('../utils/form')
 let code = require('../utils/code')
 
 module.exports = function(Customer) {
-    Customer.openApp = async function(machineId, publicKey) {
+    Customer.openApp = async function(information) {
+        let machineId = parseInt(information.split(':::')[0])
+        let publicKey = information.split(':::')[1]
+        // console.log(machineId)
+        // console.log(publicKey)
         let Machine = app.models.Machine
         let [errMachine, machine] = await to (Machine.findOne({where: {machineId}}))
 
@@ -17,7 +21,11 @@ module.exports = function(Customer) {
         return await form.productForm(machineId, publicKey)
     }
 
-    Customer.buy = async function(list, machineId, publicKey) {
+    Customer.buy = async function(req, information) {
+        let list = req.body
+        let machineId = parseInt(information.split(':::')[0])
+        let publicKey = information.split(':::')[1]
+        publicKey = "-----BEGIN PUBLIC KEY----- MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJEQ4DedOewYLSpL4voJYoJa2JjZGTfd 3XTuDASnWIamvlhG0htrEh33aq2U57aYj646J3KUuLjVp7jTxe5Em3ECAwEAAQ== -----END PUBLIC KEY-----"
         // console.log(list, machineId, publicKey)
         // let list = metadata.elements
         // for (let i in list) {
@@ -27,13 +35,16 @@ module.exports = function(Customer) {
         // list = JSON.parse(list)
         let standardList = {}
         let ProductMachine = app.models.ProductMachine
-        for (const [key, value] of Object.entries(list)) {
+        let Product = app.models.Product
+        let sum = 0;
+        for (let [key, value] of Object.entries(list)) {
             let machineIdInList = parseInt(key.split('_')[0], 10)
             if (machineIdInList != machineId) {
                 continue
             }
             let productIdInList = parseInt(key.split('_')[1], 10)
             let remain = ProductMachine.findOne({where: {productId: productIdInList, machineId: machineIdInList}}).amount
+            value = parseInt(value, 10)
             if (value < 0) {
                 value = 0
             }
@@ -41,22 +52,29 @@ module.exports = function(Customer) {
                 value = remain
             }
             standardList[productIdInList] = value
+            let price = Product.findOne({where: {productId: productIdInList}}).price
+            sum += value * price
         }
         let listString = JSON.stringify(standardList);
         // console.log(listString)
         let listStringEncrypted = await code.encryptRSA(listString, publicKey)
         // console.log(listStringEncrypted)
         let qrBase64 = await code.encodeQR(listStringEncrypted)
-        return await form.QR(qrBase64, machineId, publicKey)
+        let qrForm = await form.QR(qrBase64, machineId, publicKey)
+        qrForm.metadata.elements.push({
+            type: 'text',
+            style: 'paragraph',
+            content: `Giá tiền: ${sum}`
+        })
+        return qrForm
     }
 
     Customer.remoteMethod(
         'openApp', {
-            http: {path: '/open-app', verb: 'get'},
+            http: {path: '/open-app', verb: 'post'},
             accepts:
             [
-                {arg: 'machine_id', type: 'number', required: true},
-                {arg: 'public_key', type: 'string', required: true}
+                {arg: 'information', type: 'string', required: true, http: {source: 'query'}}
             ],
             returns: {arg: 'data', type: 'object'}
         }
@@ -67,9 +85,8 @@ module.exports = function(Customer) {
             http: {path: '/buy', verb: 'post'},
             accepts:
             [
-                {arg: 'list', type: 'object', required: true},
-                {arg: 'machine_id', type: 'number', required: true, http: {source: 'query'}},
-                {arg: 'public_key', type: 'string', required: true, http: {source: 'query'}}
+                {arg: 'req', type: 'object', required: true, http: {source: 'req'}},
+                {arg: 'information', type: 'string', required: true, http: {source: 'query'}}
             ],
             returns: {arg: 'data', type: 'object'}
         }
