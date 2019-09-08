@@ -52,8 +52,11 @@ module.exports = function(Customer) {
                 value = remain
             }
             standardList[productIdInList] = value
-            let price = Product.findOne({where: {productId: productIdInList}}).price
-            console.log(price)
+            let product = await Product.findOne({where: {productId: productIdInList}})
+            let price = product.price
+            // console.log(productIdInList)
+            // console.log(product)
+            // console.log(price)
             sum += value * price
         }
         let listString = JSON.stringify(standardList);
