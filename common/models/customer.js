@@ -35,6 +35,8 @@ module.exports = function(Customer) {
         // list = JSON.parse(list)
         let standardList = {}
         let ProductMachine = app.models.ProductMachine
+        let Product = app.models.Product
+        let sum = 0;
         for (let [key, value] of Object.entries(list)) {
             let machineIdInList = parseInt(key.split('_')[0], 10)
             if (machineIdInList != machineId) {
@@ -50,13 +52,21 @@ module.exports = function(Customer) {
                 value = remain
             }
             standardList[productIdInList] = value
+            let price = Product.findOne({where: {productId: productIdInList}})
+            sum += value * price
         }
         let listString = JSON.stringify(standardList);
         // console.log(listString)
         let listStringEncrypted = await code.encryptRSA(listString, publicKey)
         // console.log(listStringEncrypted)
         let qrBase64 = await code.encodeQR(listStringEncrypted)
-        return await form.QR(qrBase64, machineId, publicKey)
+        let qrForm = await form.QR(qrBase64, machineId, publicKey)
+        qrForm.metadata.elements.push({
+            type: 'text',
+            style: 'paragraph',
+            content: `Giá tiền: ${sum}`
+        })
+        return qrForm
     }
 
     Customer.remoteMethod(
