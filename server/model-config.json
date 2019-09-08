@@ -20,7 +20,7 @@
   },
   "Machine": {
     "dataSource": "mongodb",
-    "public": false
+    "public": true
   },
   "ProductMachine": {
     "dataSource": "mongodb",

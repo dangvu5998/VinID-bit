@@ -6,7 +6,11 @@ let form = require('../utils/form')
 let code = require('../utils/code')
 
 module.exports = function(Customer) {
-    Customer.openApp = async function(machineId, publicKey) {
+    Customer.openApp = async function(information) {
+        let machineId = parseInt(information.split(':::')[0])
+        let publicKey = information.split(':::')[1]
+        // console.log(machineId)
+        // console.log(publicKey)
         let Machine = app.models.Machine
         let [errMachine, machine] = await to (Machine.findOne({where: {machineId}}))
 
@@ -17,42 +21,71 @@ module.exports = function(Customer) {
         return await form.productForm(machineId, publicKey)
     }
 
-    Customer.buy = async function(list, machineId, publicKey) {
-        for (let i in list) {
-            let productId = list[i].productId
-            let amount = list[i].amount
+    Customer.buy = async function(req, information) {
+        let list = req.body
+        let machineId = parseInt(information.split(':::')[0])
+        let publicKey = information.split(':::')[1]
+        publicKey = "-----BEGIN PUBLIC KEY----- MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJEQ4DedOewYLSpL4voJYoJa2JjZGTfd 3XTuDASnWIamvlhG0htrEh33aq2U57aYj646J3KUuLjVp7jTxe5Em3ECAwEAAQ== -----END PUBLIC KEY-----"
+        // console.log(list, machineId, publicKey)
+        // let list = metadata.elements
+        // for (let i in list) {
+        //     let productId = list[i].productId
+        //     let amount = list[i].amount
+        // }
+        // list = JSON.parse(list)
+        let standardList = {}
+        let ProductMachine = app.models.ProductMachine
+        let Product = app.models.Product
+        let sum = 0;
+        for (let [key, value] of Object.entries(list)) {
+            let machineIdInList = parseInt(key.split('_')[0], 10)
+            if (machineIdInList != machineId) {
+                continue
+            }
+            let productIdInList = parseInt(key.split('_')[1], 10)
+            let product_machine = await ProductMachine.findOne({where: {productId: productIdInList, machineId: machineIdInList}})
+            let remain = product_machine.amount
+            value = parseInt(value, 10)
+            if (value < 0) {
+                value = 0
+            }
+            if (value > remain) {
+                value = remain
+            }
+            standardList[productIdInList] = value
+            let product = await Product.findOne({where: {productId: productIdInList}})
+            let price = product.price
+            console.log("----")
+            console.log(productIdInList)
+            console.log(product)
+            console.log(price)
+            console.log(value)
+            console.log(remain)
+            sum += value * price
+            product_machine.amount -= value
+            product_machine.sales += value
+            await ProductMachine.upsert(product_machine)
         }
-        let listString = JSON.stringify(list);
+        let listString = JSON.stringify(standardList);
+        // console.log(listString)
         let listStringEncrypted = await code.encryptRSA(listString, publicKey)
-        console.log('-----------------')
-        console.log(listStringEncrypted)
-        let pub_key = `-----BEGIN PUBLIC KEY-----
-                    MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIK8JmM8nrUZPso0rqN8p+oNmcDM9aDb
-                    iOmExy+Qi5Wdotb+8Qc6ICvNFzPxV2xAGZIy1JzxYggrcx1Dn5ANEb8CAwEAAQ==
-                    -----END PUBLIC KEY-----
-                    `
-        let pri_k = `-----BEGIN RSA PRIVATE KEY-----
-            MIIBOgIBAAJBAIK8JmM8nrUZPso0rqN8p+oNmcDM9aDbiOmExy+Qi5Wdotb+8Qc6
-            ICvNFzPxV2xAGZIy1JzxYggrcx1Dn5ANEb8CAwEAAQJAd2qTifv6YCOyNhOPHeik
-            nGdV9UWCbC97zQoqw2i+B6fFlZ0Hb+SMTV70b8zXcv47BVuDllH73RdSsRAixYTZ
-            GQIhANn8Z1BIFoNpaMwtWUDbrCKqHp+7+oA0DyaZngxsrrdDAiEAmYiUnxIThyEm
-            8J+AQBBfOArqrsH83TSWBi6yOrukHdUCIQDGkWC/RduUO4omK80ZAsJsFVGuKjtH
-            W6TNgbPyF3KUJwIga6pxvpMoioxfCEJx53sTqvNM27xBnMXxpug8KB/J2PkCIHU9
-            85Uqsug6w1xL6zFghnYt+IpKPNAobL63LMlML5AB
-            -----END RSA PRIVATE KEY-----`
-        console.log(await code.decryptRSA(listStringEncrypted, pri_k))
-        console.log('-----------------')
+        // console.log(listStringEncrypted)
         let qrBase64 = await code.encodeQR(listStringEncrypted)
-        return await form.QR(qrBase64, machineId, publicKey)
+        let qrForm = await form.QR(qrBase64, machineId, publicKey)
+        qrForm.metadata.elements.push({
+            type: 'text',
+            style: 'paragraph',
+            content: `Giá tiền: ${sum}`
+        })
+        return qrForm
     }
 
     Customer.remoteMethod(
         'openApp', {
-            http: {path: '/open-app', verb: 'get'},
+            http: {path: '/open-app', verb: 'post'},
             accepts:
             [
-                {arg: 'machine_id', type: 'number', required: true},
-                {arg: 'public_key', type: 'string', required: true}
+                {arg: 'information', type: 'string', required: true, http: {source: 'query'}}
             ],
             returns: {arg: 'data', type: 'object'}
         }
@@ -63,9 +96,8 @@ module.exports = function(Customer) {
             http: {path: '/buy', verb: 'post'},
             accepts:
             [
-                {arg: 'list', type: 'any', required: true},
-                {arg: 'machine_id', type: 'number', required: true},
-                {arg: 'public_key', type: 'string', required: true}
+                {arg: 'req', type: 'object', required: true, http: {source: 'req'}},
+                {arg: 'information', type: 'string', required: true, http: {source: 'query'}}
             ],
             returns: {arg: 'data', type: 'object'}
         }
