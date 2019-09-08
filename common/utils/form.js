@@ -1,6 +1,6 @@
 let app = require('../../server/server')
 let to = require('await-to-js').to
-let urlRoot = "https://teambit.tech/api/customers"
+let urlRoot = "https://vinid-bit.herokuapp.com/api/customers"
 template = {
     "metadata": {
         "app_name": "bitZero",
@@ -53,7 +53,7 @@ module.exports = {
                 label: productName
             })
         }
-        form.metadata.submit_button.url = urlRoot + "/buy"
+        form.metadata.submit_button.url = urlRoot + "/buy" + `?machine_id=${machineId}&public_key=${publicKey}`
         return form
     },
 
@@ -63,7 +63,7 @@ module.exports = {
         form.public_key = publicKey
         form.metadata.elements.push({
             type: 'web',
-            content: `<html><body><h2>QR Code<h2><img src=${qrBase64} alt="QR Code" width="800" height="800"><body><html>`
+            content: `<html><body><h2>QR Code<h2><img src=${qrBase64} alt="QR Code" width="300" height="300"><body><html>`
         })
         return form
     }

@@ -18,30 +18,34 @@ module.exports = function(Customer) {
     }
 
     Customer.buy = async function(list, machineId, publicKey) {
-        for (let i in list) {
-            let productId = list[i].productId
-            let amount = list[i].amount
+        // console.log(list, machineId, publicKey)
+        // let list = metadata.elements
+        // for (let i in list) {
+        //     let productId = list[i].productId
+        //     let amount = list[i].amount
+        // }
+        // list = JSON.parse(list)
+        let standardList = {}
+        let ProductMachine = app.models.ProductMachine
+        for (const [key, value] of Object.entries(list)) {
+            let machineIdInList = parseInt(key.split('_')[0], 10)
+            if (machineIdInList != machineId) {
+                continue
+            }
+            let productIdInList = parseInt(key.split('_')[1], 10)
+            let remain = ProductMachine.findOne({where: {productId: productIdInList, machineId: machineIdInList}}).amount
+            if (value < 0) {
+                value = 0
+            }
+            if (value > remain) {
+                value = remain
+            }
+            standardList[productIdInList] = value
         }
-        let listString = JSON.stringify(list);
+        let listString = JSON.stringify(standardList);
+        // console.log(listString)
         let listStringEncrypted = await code.encryptRSA(listString, publicKey)
-        console.log('-----------------')
-        console.log(listStringEncrypted)
-        let pub_key = `-----BEGIN PUBLIC KEY-----
-                    MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIK8JmM8nrUZPso0rqN8p+oNmcDM9aDb
-                    iOmExy+Qi5Wdotb+8Qc6ICvNFzPxV2xAGZIy1JzxYggrcx1Dn5ANEb8CAwEAAQ==
-                    -----END PUBLIC KEY-----
-                    `
-        let pri_k = `-----BEGIN RSA PRIVATE KEY-----
-            MIIBOgIBAAJBAIK8JmM8nrUZPso0rqN8p+oNmcDM9aDbiOmExy+Qi5Wdotb+8Qc6
-            ICvNFzPxV2xAGZIy1JzxYggrcx1Dn5ANEb8CAwEAAQJAd2qTifv6YCOyNhOPHeik
-            nGdV9UWCbC97zQoqw2i+B6fFlZ0Hb+SMTV70b8zXcv47BVuDllH73RdSsRAixYTZ
-            GQIhANn8Z1BIFoNpaMwtWUDbrCKqHp+7+oA0DyaZngxsrrdDAiEAmYiUnxIThyEm
-            8J+AQBBfOArqrsH83TSWBi6yOrukHdUCIQDGkWC/RduUO4omK80ZAsJsFVGuKjtH
-            W6TNgbPyF3KUJwIga6pxvpMoioxfCEJx53sTqvNM27xBnMXxpug8KB/J2PkCIHU9
-            85Uqsug6w1xL6zFghnYt+IpKPNAobL63LMlML5AB
-            -----END RSA PRIVATE KEY-----`
-        console.log(await code.decryptRSA(listStringEncrypted, pri_k))
-        console.log('-----------------')
+        // console.log(listStringEncrypted)
         let qrBase64 = await code.encodeQR(listStringEncrypted)
         return await form.QR(qrBase64, machineId, publicKey)
     }
@@ -63,9 +67,9 @@ module.exports = function(Customer) {
             http: {path: '/buy', verb: 'post'},
             accepts:
             [
-                {arg: 'list', type: 'any', required: true},
-                {arg: 'machine_id', type: 'number', required: true},
-                {arg: 'public_key', type: 'string', required: true}
+                {arg: 'list', type: 'object', required: true},
+                {arg: 'machine_id', type: 'number', required: true, http: {source: 'query'}},
+                {arg: 'public_key', type: 'string', required: true, http: {source: 'query'}}
             ],
             returns: {arg: 'data', type: 'object'}
         }
