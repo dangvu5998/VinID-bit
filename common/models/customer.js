@@ -52,7 +52,7 @@ module.exports = function(Customer) {
                 value = remain
             }
             standardList[productIdInList] = value
-            let price = Product.findOne({where: {productId: productIdInList}})
+            let price = Product.findOne({where: {productId: productIdInList}}).price
             sum += value * price
         }
         let listString = JSON.stringify(standardList);
