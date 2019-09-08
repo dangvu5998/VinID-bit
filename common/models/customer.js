@@ -11,17 +11,22 @@ module.exports = function(Customer) {
         let [errMachine, machine] = await to (Machine.findOne({where: {machineId}}))
 
         if (errMachine || !machineId) {
-            return form.errorForm();
+            return await form.errorForm();
         }
 
-        return form.productForm(machineId, publicKey)
+        return await form.productForm(machineId, publicKey)
     }
 
     Customer.buy = async function(list, publicKey) {
+        for (let i in list) {
+            let productId = list[i].productId
+            let amount = list[i].amount
+
+        }
         let listString = JSON.stringify(list);
-        let listStringEncrypted = code.encrypt(listString, publicKey)
-        let qrBase64 = code.encodeQR(listStringEncrypted)
-        return form.QR(qrBase64)
+        let listStringEncrypted = await code.encryptRSA(listString, publicKey)
+        let qrBase64 = await code.encodeQR(listStringEncrypted)
+        return await form.QR(qrBase64, machineId, publicKey)
     }
 
     Customer.remoteMethod(
@@ -42,6 +47,7 @@ module.exports = function(Customer) {
             accepts:
             [
                 {arg: 'list', type: 'any', required: true},
+                {arg: 'machine_id', type: 'number', required: true},
                 {arg: 'public_key', type: 'string', required: true}
             ],
             returns: {arg: 'data', type: 'object'}
