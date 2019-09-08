@@ -1,30 +1,29 @@
 let app = require('../../server/server')
 let to = require('await-to-js').to
 let urlRoot = "https://vinid-bit.herokuapp.com/api/customers"
-template = {
-    "metadata": {
-        "app_name": "bitZero",
-        "title": "bitZero",
-        "submit_button": {
-            "label": "Gửi thông tin",
-            "background_color": "#6666ff",
-            "cta": "request",
-            "url": urlRoot + "/open-app"
-        },
-        "reset_button": {
-            "label": "Xoá bản ghi",
-            "background_color": "#669999"
-        },
-        "elements": []
-    },
-    "machine_id": "",
-    "public_key": ""
-}
 
 module.exports = {
     errorForm: async () => {
-        let form = template
-        template.metadata.elements.push({
+        let form = {
+            "metadata": {
+                "app_name": "bitZero",
+                "title": "bitZero",
+                "submit_button": {
+                    "label": "Gửi thông tin",
+                    "background_color": "#6666ff",
+                    "cta": "request",
+                    "url": urlRoot + "/open-app"
+                },
+                "reset_button": {
+                    "label": "Xoá bản ghi",
+                    "background_color": "#669999"
+                },
+                "elements": []
+            },
+            "machine_id": "",
+            "public_key": ""
+        }
+        form.metadata.elements.push({
             'type': 'text',
             'style': 'paragraph',
             'content': 'Yêu cầu không hợp lệ!'
@@ -38,7 +37,25 @@ module.exports = {
         if (errorPM || !productMachine) {
             return await this.errorForm
         }
-        let form = template
+        let form = {
+            "metadata": {
+                "app_name": "bitZero",
+                "title": "bitZero",
+                "submit_button": {
+                    "label": "Gửi thông tin",
+                    "background_color": "#6666ff",
+                    "cta": "request",
+                    "url": urlRoot + "/open-app"
+                },
+                "reset_button": {
+                    "label": "Xoá bản ghi",
+                    "background_color": "#669999"
+                },
+                "elements": []
+            },
+            "machine_id": "",
+            "public_key": ""
+        }
         form.machine_id = machineId
         form.public_key = publicKey
         let Product = app.models.Product
@@ -58,7 +75,25 @@ module.exports = {
     },
 
     QR: async (qrBase64, machineId, publicKey) => {
-        let form = template
+        let form = {
+            "metadata": {
+                "app_name": "bitZero",
+                "title": "bitZero",
+                "submit_button": {
+                    "label": "Gửi thông tin",
+                    "background_color": "#6666ff",
+                    "cta": "request",
+                    "url": urlRoot + "/open-app"
+                },
+                "reset_button": {
+                    "label": "Xoá bản ghi",
+                    "background_color": "#669999"
+                },
+                "elements": []
+            },
+            "machine_id": "",
+            "public_key": ""
+        }
         form.machine_id = machineId
         form.public_key = publicKey
         form.metadata.elements.push({
