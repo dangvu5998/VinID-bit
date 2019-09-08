@@ -17,14 +17,31 @@ module.exports = function(Customer) {
         return await form.productForm(machineId, publicKey)
     }
 
-    Customer.buy = async function(list, publicKey) {
+    Customer.buy = async function(list, machineId, publicKey) {
         for (let i in list) {
             let productId = list[i].productId
             let amount = list[i].amount
-
         }
         let listString = JSON.stringify(list);
         let listStringEncrypted = await code.encryptRSA(listString, publicKey)
+        console.log('-----------------')
+        console.log(listStringEncrypted)
+        let pub_key = `-----BEGIN PUBLIC KEY-----
+                    MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAIK8JmM8nrUZPso0rqN8p+oNmcDM9aDb
+                    iOmExy+Qi5Wdotb+8Qc6ICvNFzPxV2xAGZIy1JzxYggrcx1Dn5ANEb8CAwEAAQ==
+                    -----END PUBLIC KEY-----
+                    `
+        let pri_k = `-----BEGIN RSA PRIVATE KEY-----
+            MIIBOgIBAAJBAIK8JmM8nrUZPso0rqN8p+oNmcDM9aDbiOmExy+Qi5Wdotb+8Qc6
+            ICvNFzPxV2xAGZIy1JzxYggrcx1Dn5ANEb8CAwEAAQJAd2qTifv6YCOyNhOPHeik
+            nGdV9UWCbC97zQoqw2i+B6fFlZ0Hb+SMTV70b8zXcv47BVuDllH73RdSsRAixYTZ
+            GQIhANn8Z1BIFoNpaMwtWUDbrCKqHp+7+oA0DyaZngxsrrdDAiEAmYiUnxIThyEm
+            8J+AQBBfOArqrsH83TSWBi6yOrukHdUCIQDGkWC/RduUO4omK80ZAsJsFVGuKjtH
+            W6TNgbPyF3KUJwIga6pxvpMoioxfCEJx53sTqvNM27xBnMXxpug8KB/J2PkCIHU9
+            85Uqsug6w1xL6zFghnYt+IpKPNAobL63LMlML5AB
+            -----END RSA PRIVATE KEY-----`
+        console.log(await code.decryptRSA(listStringEncrypted, pri_k))
+        console.log('-----------------')
         let qrBase64 = await code.encodeQR(listStringEncrypted)
         return await form.QR(qrBase64, machineId, publicKey)
     }
