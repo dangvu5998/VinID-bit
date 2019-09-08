@@ -43,7 +43,8 @@ module.exports = function(Customer) {
                 continue
             }
             let productIdInList = parseInt(key.split('_')[1], 10)
-            let remain = ProductMachine.findOne({where: {productId: productIdInList, machineId: machineIdInList}}).amount
+            let product_machine = await ProductMachine.findOne({where: {productId: productIdInList, machineId: machineIdInList}})
+            let remain = product_machine.amount
             value = parseInt(value, 10)
             if (value < 0) {
                 value = 0
@@ -54,9 +55,12 @@ module.exports = function(Customer) {
             standardList[productIdInList] = value
             let product = await Product.findOne({where: {productId: productIdInList}})
             let price = product.price
-            // console.log(productIdInList)
-            // console.log(product)
-            // console.log(price)
+            console.log("----")
+            console.log(productIdInList)
+            console.log(product)
+            console.log(price)
+            console.log(value)
+            console.log(remain)
             sum += value * price
         }
         let listString = JSON.stringify(standardList);

@@ -66,7 +66,7 @@ module.exports = {
             form.metadata.elements.push({
                 type: 'input',
                 input_type: 'number',
-                name: `${productMachine[i].productId}_${productMachine[i].machineId}`,
+                name: `${productMachine[i].machineId}_${productMachine[i].productId}`,
                 placeholder: `Còn ${productMachine[i].amount} sản phẩm`,
                 label: `${productName} - ${productPrice}`
             })
