@@ -1,6 +1,6 @@
 let app = require('../../server/server')
 let to = require('await-to-js').to
-let urlRoot = "https://teambit.tech/api/customers"
+let urlRoot = "https://vinid-bit.herokuapp.com/"
 template = {
     "metadata": {
         "app_name": "bitZero",
