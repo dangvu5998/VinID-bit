@@ -6,7 +6,11 @@ let form = require('../utils/form')
 let code = require('../utils/code')
 
 module.exports = function(Customer) {
-    Customer.openApp = async function(machineId, publicKey) {
+    Customer.openApp = async function(information) {
+        let machineId = parseInt(information.split(':::')[0])
+        let publicKey = information.split(':::')[1]
+        // console.log(machineId)
+        // console.log(publicKey)
         let Machine = app.models.Machine
         let [errMachine, machine] = await to (Machine.findOne({where: {machineId}}))
 
@@ -55,8 +59,7 @@ module.exports = function(Customer) {
             http: {path: '/open-app', verb: 'post'},
             accepts:
             [
-                {arg: 'machine_id', type: 'number', required: true, http: {source: 'query'}},
-                {arg: 'public_key', type: 'string', required: true, http: {source: 'query'}}
+                {arg: 'information', type: 'string', required: true, http: {source: 'query'}}
             ],
             returns: {arg: 'data', type: 'object'}
         }
@@ -68,8 +71,7 @@ module.exports = function(Customer) {
             accepts:
             [
                 {arg: 'list', type: 'object', required: true},
-                {arg: 'machine_id', type: 'number', required: true, http: {source: 'query'}},
-                {arg: 'public_key', type: 'string', required: true, http: {source: 'query'}}
+                {arg: 'information', type: 'string', required: true, http: {source: 'query'}}
             ],
             returns: {arg: 'data', type: 'object'}
         }
