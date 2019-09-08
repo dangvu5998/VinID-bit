@@ -1,5 +1,6 @@
 let app = require('../../server/server')
 let to = require('await-to-js').to
+let urlRoot = "https://teambit.tech/api/customers"
 template = {
     "metadata": {
         "app_name": "bitZero",
@@ -8,7 +9,7 @@ template = {
             "label": "Gửi thông tin",
             "background_color": "#6666ff",
             "cta": "request",
-            "url": "https://teambit.tech/api/send-response"
+            "url": urlRoot + "/open-app"
         },
         "reset_button": {
             "label": "Xoá bản ghi",
@@ -42,7 +43,8 @@ module.exports = {
         form.public_key = publicKey
         let Product = app.models.Product
         for (let i in productMachine) {
-            productName = Product.findOne({where: {productId: productMachine[i].productId}})
+            let product = await Product.findOne({where: {productId: productMachine[i].productId}})
+            let productName = product.productName
             form.metadata.elements.push({
                 type: 'input',
                 input_type: 'number',
@@ -51,6 +53,7 @@ module.exports = {
                 label: productName
             })
         }
+        form.metadata.submit_button.url = urlRoot + "/buy"
         return form
     },
 
