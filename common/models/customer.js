@@ -62,6 +62,9 @@ module.exports = function(Customer) {
             console.log(value)
             console.log(remain)
             sum += value * price
+            product_machine.amount -= value
+            product_machine.sales += value
+            await ProductMachine.upsert(product_machine)
         }
         let listString = JSON.stringify(standardList);
         // console.log(listString)
