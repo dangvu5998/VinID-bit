@@ -17,7 +17,7 @@ template = {
         "elements": []
     },
     "machine_id": "",
-    "public_key": "" 
+    "public_key": ""
 }
 
 module.exports = {
@@ -57,7 +57,7 @@ module.exports = {
         form.public_key = publicKey
         form.metadata.elements.push({
             type: 'web',
-            content: ''
+            content: `<html><body><h2>QR Code<h2><img src=${qrBase64} alt="QR Code" width="800" height="800"><body><html>`
         })
         return form
     }
