@@ -1,9 +1,9 @@
 let app = require('../../server/server')
-let to = ('await-to-js').to
+let to = require('await-to-js').to
 template = {
     "metadata": {
         "app_name": "bitZero",
-        "title": "bitZero - Tự định nghĩa cách bạn mua hàng",
+        "title": "bitZero",
         "submit_button": {
             "label": "Gửi thông tin",
             "background_color": "#6666ff",
@@ -40,12 +40,15 @@ module.exports = {
         let form = template
         form.machine_id = machineId
         form.public_key = publicKey
+        let Product = app.models.Product
         for (let i in productMachine) {
+            productName = Product.findOne({where: {productId: productMachine[i].productId}})
             form.metadata.elements.push({
                 type: 'input',
                 input_type: 'number',
                 name: `${productMachine[i].productId}_${productMachine[i].machineId}`,
-                placeholder: `Số sản phẩm còn lại là: ${productMachine[i].amount}`
+                placeholder: `Còn ${productMachine[i].amount} sản phẩm`,
+                label: productName
             })
         }
         return form
