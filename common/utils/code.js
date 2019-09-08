@@ -1,9 +1,5 @@
 const QRCode = require('qrcode');
 
-async function encodeQR(msg) {
-    try {
-        return await QRCode.toDataURL(msg)
-    } catch(err) {
-        return null;
-    }
+exports.encodeQR =  async (msg) => {
+    return QRCode.toDataURL(msg);
 }
